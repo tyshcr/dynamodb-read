@@ -1,27 +1,24 @@
 var AWS = require("aws-sdk");
 
-exports.handler = function(event, context) {
+exports.handler = function(event, context, callback) {
     var docClient = new AWS.DynamoDB.DocumentClient();
 
     var params = {
-        "TableName" : "standings",
-        "KeyConditionExpression" : "conference = :conf",
-        "ExpressionAttributeValues" : {":conf": "Eastern"}
-
+        "TableName" : "mlb",
+        "FilterExpression" : "conference = :conf and division = :div",
+        "ExpressionAttributeValues" : {":conf": "AL", ":div": "C"}
     };
 
-    var output = docClient.query(params, function(err, data) {
+    var output = docClient.scan(params, function(err, data) {
         if (err) {
-            console.error("Unable to query. Error:", JSON.stringify(err, null, 2));
+            // console.error("Unable to query. Error:", JSON.stringify(err, null, 2));
+            callback(err, "Query Failed")
         } else {
-            var output = '<html><body><table>';
-            console.log("Query succeeded.");
-            data.Items.forEach(function(item) {
-                console.log(" -", item.city + ": " + item.nickname);
-                output += "<tr><td>" + item.city + "</td><td>" + item.nickname + "</td></tr>";
-            });
-            output += "</table></body></html>"
-            context.succeed(output);
+          data.Items.sort(function(a, b) {
+                return a.rank > b.rank
+            })
+            // console.log(JSON.stringify(data))
+            callback(null, JSON.stringify(data))
         }
     });
 
