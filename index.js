@@ -18,7 +18,7 @@ exports.handler = function(event, context, callback) {
                 return a.rank > b.rank
             })
             // console.log(JSON.stringify(data))
-            callback(null, JSON.stringify(data))
+            callback(null, data)
         }
     });
 
