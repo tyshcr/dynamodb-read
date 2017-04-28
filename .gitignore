@@ -1,6 +1,4 @@
 .env
 deploy.env
 event.json
-.env
-deploy.env
-event.json
+node_modules/
